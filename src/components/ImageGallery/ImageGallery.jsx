@@ -11,23 +11,25 @@ export const ImageGallery = ({ onImageClick, searchQuery }) => {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-
-  useEffect(()=>{
-    setPage(1);
-    setImages([]);
-  }, [searchQuery])
+  const [search, setSearch] = useState('');
 
   useEffect(() => {
-    if (searchQuery === '') {
+    setPage(1);
+    setImages([]);
+    setSearch(searchQuery);
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (search === '') {
       return;
     }
 
     setLoading(true);
-    
-    fetchApiImages(searchQuery, page).then(({ hits, totalHits }) => {      
+
+    fetchApiImages(search, page).then(({ hits, totalHits }) => {
       if (hits.length === 0) {
         Notiflix.Notify.failure(
-          `Sorry, there are no images ${searchQuery} matching your search query. Please try again.`
+          `Sorry, there are no images ${search} matching your search query. Please try again.`
         );
         setLoading(false);
         return;
@@ -40,7 +42,7 @@ export const ImageGallery = ({ onImageClick, searchQuery }) => {
         setLoading(false);
         return;
       }
-      if (page === 1 ) {
+      if (page === 1) {
         setImages([]);
         setLoading(false);
       }
@@ -56,57 +58,7 @@ export const ImageGallery = ({ onImageClick, searchQuery }) => {
       setImages(prev => [...prev, ...newImage]);
       setLoading(false);
     });
-  }, [page, searchQuery]);
-
-  // componentDidUpdate(prevProps, prevState) {
-  //   const prevSearch = prevProps.searchQuery;
-  //   const nextSearch = this.props.searchQuery;
-  //   const prevPage = prevState.page;
-  //   const nextPage = this.state.page;
-
-  //   if (prevSearch !== nextSearch) {
-  //     this.setState({ searchQuery: nextSearch, images: [], page: 1 });
-  //   }
-
-  //   if (
-  //     (prevSearch !== nextSearch && nextPage === 1) ||
-  //     prevPage !== nextPage
-  //   ) {
-  //     this.setState({ loading: true });
-
-  //     fetchApiImages(nextSearch, nextPage).then(({ hits, totalHits }) => {
-  //       if (hits.length === 0) {
-  //         Notiflix.Notify.failure(
-  //           `Sorry, there are no images ${nextSearch} matching your search query. Please try again.`
-  //         );
-  //         this.setState({ loading: false });
-  //         return;
-  //       }
-
-  //       if (hits.length === 0 && totalHits !== 0) {
-  //         Notiflix.Notify.info(
-  //           "We're sorry, but you've reached the end of search results."
-  //         );
-  //         this.setState({ loading: false });
-  //         return;
-  //       }
-
-  //       const newImage = hits.map(
-  //         ({ id, webformatURL, largeImageURL, tags }) => ({
-  //           id,
-  //           webformatURL,
-  //           largeImageURL,
-  //           tags,
-  //         })
-  //       );
-
-  //       this.setState(({ images }) => ({
-  //         images: [...images, ...newImage],
-  //         loading: false,
-  //       }));
-  //     });
-  //   }
-  // }
+  }, [page, search]);
 
   const loadMore = () => {
     setPage(prev => prev + 1);
