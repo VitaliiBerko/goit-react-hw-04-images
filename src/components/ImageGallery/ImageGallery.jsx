@@ -12,12 +12,19 @@ export const ImageGallery = ({ onImageClick, searchQuery }) => {
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
 
+  useEffect(()=>{
+    setPage(1);
+    setImages([]);
+  }, [searchQuery])
+
   useEffect(() => {
     if (searchQuery === '') {
       return;
     }
+
     setLoading(true);
-    fetchApiImages(searchQuery, page).then(({ hits, totalHits }) => {
+    
+    fetchApiImages(searchQuery, page).then(({ hits, totalHits }) => {      
       if (hits.length === 0) {
         Notiflix.Notify.failure(
           `Sorry, there are no images ${searchQuery} matching your search query. Please try again.`
@@ -33,7 +40,7 @@ export const ImageGallery = ({ onImageClick, searchQuery }) => {
         setLoading(false);
         return;
       }
-      if (page === 1) {
+      if (page === 1 ) {
         setImages([]);
         setLoading(false);
       }
@@ -46,7 +53,6 @@ export const ImageGallery = ({ onImageClick, searchQuery }) => {
           tags,
         })
       );
-
       setImages(prev => [...prev, ...newImage]);
       setLoading(false);
     });
